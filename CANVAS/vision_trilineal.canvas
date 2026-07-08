@@ -1,0 +1,68 @@
+{
+  "nodes": [
+    {"id":"center","type":"text","text":"# 🜂 VISIÓN COGNITIVA TRILINEAL\n\n**Autor:** Javier Arturo Torres Casillas (ArT-AtR)\n**Codex synth:** 2026-04-22\n\n## Fórmula\n```\nBase → Centro → Acción\nRealidad → Señal → Movimiento\n```\n\n**Regla maestra:**\nNo leer en línea recta.\nLeer del centro hacia afuera,\ny de ahí bajar a acción.\n\n📄 `_control/VISION_COGNITIVA_TRILINEAL.md`","x":-250,"y":-200,"width":500,"height":400,"color":"6"},
+
+    {"id":"line_base","type":"text","text":"## 📐 LÍNEA BASE\n*¿Qué estoy viendo de verdad?*\n\nLo material:\n• hardware • runtime • modelo\n• proceso • endpoint • archivo\n• pantalla • sesión\n\n**Primero realidad, luego interpretación.**","x":-1000,"y":-350,"width":380,"height":260,"color":"1"},
+    {"id":"line_centro","type":"text","text":"## 🎯 LÍNEA CENTRO\n*¿Cuál es la señal, patrón o estructura viva?*\n\nLo cognitivo:\n• reglas duras • identidad • memoria\n• heritage • nódulos • triggers\n• prioridades • relaciones\n\n**Filter + focus.**","x":-250,"y":-700,"width":380,"height":260,"color":"3"},
+    {"id":"line_accion","type":"text","text":"## ⚡ LÍNEA ACCIÓN\n*¿Qué se debe hacer ahora, sin humo?*\n\nLa salida operativa:\n• decisión • prioridad • bloqueo\n• ruta • siguiente paso\n• no-acción justificada\n\n**Colapsar ruido en decisión.**","x":500,"y":-350,"width":380,"height":260,"color":"4"},
+
+    {"id":"form1","type":"text","text":"### 1️⃣ Forma Cognitiva\n*La visión madre*\n\nBase / Centro / Acción\nRealidad / Señal / Movimiento\n\n📄 `_control/VISION_COGNITIVA_TRILINEAL.md`","x":-1800,"y":200,"width":340,"height":200,"color":"6"},
+    {"id":"form2","type":"text","text":"### 2️⃣ Forma Conversacional\n*Uso dentro de chats*\n\nBASE / CENTRO / ACCIÓN / EVIDENCIA / VEREDICTO\n\n📄 `_control/TRILINEAL_OPERATOR_BLOCK.md`","x":-1400,"y":200,"width":340,"height":200,"color":"6"},
+    {"id":"form3","type":"text","text":"### 3️⃣ Forma Prompt Universal\n*Enseñar a otros LLMs*\n\nES / EN / 中文\nBASE / CENTRO / ACCIÓN / VEREDICTO\n\n📄 `_control/GO_WAKE_TRILINEAL.md`","x":-1000,"y":200,"width":340,"height":200,"color":"6"},
+    {"id":"form4","type":"text","text":"### 4️⃣ Forma GO / Operativa\n*Niveles de autorización*\n\nGO_AUDITORIA · GO_NO_APPLY · GO_EJECUCION · GO_DEPLOY · GO_CLAUDIO_SENIOR\n\n📄 `_control/BYFLOW_MODOS_GO_CTO_2026-04-22.md`","x":-600,"y":200,"width":340,"height":200,"color":"6"},
+    {"id":"form5","type":"text","text":"### 5️⃣ Forma Seguridad\n**CERROJO + PUENTE**\n\n• No secrets\n• No push sin GO\n• No prod sin auth\n• No loops entre agentes\n\n📁 `Desktop/_5S/_AMARILLO/04_SCRIPTS/CERROJO*/`","x":-200,"y":200,"width":340,"height":220,"color":"1"},
+    {"id":"form6","type":"text","text":"### 6️⃣ Forma Rehidratación / Wake\n*Arrancar chats sin perder contexto*\n\nGO_WAKE_TRILINEAL → GO_HANDOFF → jalar\n\n📄 `_control/GO_WAKE_TRILINEAL.md`\n📄 `_control/GO_HANDOFF_PROTOCOLO.md`","x":200,"y":200,"width":340,"height":220,"color":"6"},
+    {"id":"form7","type":"text","text":"### 7️⃣ Forma Benchmark\n*Lectura lineal vs trilineal*\n\nBuscar errores, capturar señal, mejorar claridad.\n\n📄 `_control/PROTOCOLO_BENCHMARK_TRILINEAL_MODELOS_2026-04-23.md`\n📄 `_control/BENCHMARK_TRILINEAL_CODEX_2026-04-22.md`","x":600,"y":200,"width":340,"height":220,"color":"3"},
+    {"id":"form8","type":"text","text":"### 8️⃣ Forma Certificación\n*Validación operativa*\n\nIArtLabs / M.I.J.A · 2026-05-05\n\n📄 `_control/CERTIFICACION_CTO_ESTUDIO_Y_BENCHMARKS_2026-04-23.md`\n📄 `trilinear_certification_20260505.md`","x":1000,"y":200,"width":340,"height":220,"color":"3"},
+    {"id":"form9","type":"text","text":"### 9️⃣ Forma Local / Agente CTO\n**GO_CLAUDIO_SENIOR**\n\nM.I.J.A decide\nCTO/Memo valida riesgo\nKimi/OpenCode genera\n\nFases: inventario → mapa → plan → validación → ejecución → reporte\n\n📄 `_control/GO_CLAUDIO_SENIOR.md`","x":1400,"y":200,"width":380,"height":260,"color":"6"},
+
+    {"id":"var1","type":"text","text":"### TRILINEAR_SKILL\nSkill empaquetada con sources/, references/.\n\n📁 `Desktop/_5S/_AMARILLO/05_SKILLS_AGENTES/TRILINEAR_SKILL/`","x":-1800,"y":600,"width":340,"height":180,"color":"5"},
+    {"id":"var2","type":"text","text":"### trilineal-smart-explore\nExploración inteligente trilineal.\n\n📁 dentro de TRILINEAR_SKILL","x":-1400,"y":600,"width":340,"height":160,"color":"5"},
+    {"id":"var3","type":"text","text":"### trilineal-mode (BeeCode)\nModo trilineal en BeeCode CLI.\n\n📄 `beecode-work/.agents/skills/trilineal-mode/SKILL.md`","x":-1000,"y":600,"width":340,"height":180,"color":"5"},
+    {"id":"var4","type":"text","text":"### trilinear_precision\nVariante de precisión operativa.\n\n📁 dentro de stitch_moe_workspace","x":-600,"y":600,"width":340,"height":160,"color":"5"},
+    {"id":"var5","type":"text","text":"### trilinear_corporate_intelligence\nInteligencia corporativa trilineal.\n\n📁 dentro de stitch_moe_workspace","x":-200,"y":600,"width":340,"height":180,"color":"5"},
+    {"id":"var6","type":"text","text":"### stitch_moe_trilinear\nWorkspace integrado MoE + Trilineal.\n\n📁 `Desktop/_5S/_AMARILLO/08_ZIPS/STICH/stitch_moe_trilinear_integrated_workspace/`","x":200,"y":600,"width":380,"height":200,"color":"5"},
+
+    {"id":"openai_pkg","type":"text","text":"## 📨 PAQUETE OPENAI (ya armado)\n**Modo:** GO_PROTEGIDO_CTO\n**Curador:** Codex · 2026-04-23\n**Estado:** READY para enviar","x":700,"y":600,"width":380,"height":160,"color":"2"},
+    {"id":"oai_pitch","type":"text","text":"### One-Paragraph Pitch\n*Primer contacto*\n\n📄 `_control/OPENAI_ONE_PARAGRAPH_PITCH_ARTURO_2026-04-23.md`","x":700,"y":800,"width":340,"height":160,"color":"2"},
+    {"id":"oai_exec","type":"text","text":"### Executive Summary\n*Clean attachment principal*\n\n📄 `_control/OPENAI_EXECUTIVE_SUMMARY_ARTURO_2026-04-23.md`","x":1080,"y":800,"width":340,"height":160,"color":"2"},
+    {"id":"oai_evid","type":"text","text":"### Evidence Appendix\n*Solo si piden profundidad*\n\n📄 `_control/OPENAI_EVIDENCE_APPENDIX_ARTURO_2026-04-23.md`","x":700,"y":980,"width":340,"height":160,"color":"2"},
+    {"id":"oai_email","type":"text","text":"### Email Kit\n*Borradores listos*\n\n📄 `_control/EMAIL_OPENAI_CANDIDATURA_CODEX_2026-04-23.md`","x":1080,"y":980,"width":340,"height":160,"color":"2"},
+    {"id":"oai_36d","type":"text","text":"### Construcción 36 Días\n*Build-window study*\n\n📄 `_control/ESTUDIO_CONSTRUCCION_EN_36_DIAS_ARTURO_2026-04-23.md`","x":700,"y":1160,"width":340,"height":160,"color":"2"},
+    {"id":"oai_pixel","type":"text","text":"### Pixel Evidence\n*Visual curada para presentación*\n\n📄 `_control/EVIDENCIA_CURADA_PIXEL_ESTUDIO_OPENAI_2026-04-23.md`","x":1080,"y":1160,"width":340,"height":180,"color":"2"},
+
+    {"id":"names","type":"text","text":"## 🏷️ NOMBRES OFICIALES\n\n• Interno: **Visión Cognitiva Trilineal**\n• Técnico OpenAI: **Trilinear Context Segmentation and Continuity Protocol**\n• Corto: Método Trilineal\n• Espacio: Espacio Trilineal\n• Operativo: GO Trilineal\n• Producto: **Trilinear Operating Framework**","x":-1800,"y":-700,"width":420,"height":300,"color":"6"}
+  ],
+  "edges": [
+    {"id":"e_base","fromNode":"center","fromSide":"left","toNode":"line_base","toSide":"right","label":"1"},
+    {"id":"e_centro","fromNode":"center","fromSide":"top","toNode":"line_centro","toSide":"bottom","label":"2"},
+    {"id":"e_accion","fromNode":"center","fromSide":"right","toNode":"line_accion","toSide":"left","label":"3"},
+
+    {"id":"e_f1","fromNode":"center","fromSide":"bottom","toNode":"form1","toSide":"top"},
+    {"id":"e_f2","fromNode":"center","fromSide":"bottom","toNode":"form2","toSide":"top"},
+    {"id":"e_f3","fromNode":"center","fromSide":"bottom","toNode":"form3","toSide":"top"},
+    {"id":"e_f4","fromNode":"center","fromSide":"bottom","toNode":"form4","toSide":"top"},
+    {"id":"e_f5","fromNode":"center","fromSide":"bottom","toNode":"form5","toSide":"top"},
+    {"id":"e_f6","fromNode":"center","fromSide":"bottom","toNode":"form6","toSide":"top"},
+    {"id":"e_f7","fromNode":"center","fromSide":"bottom","toNode":"form7","toSide":"top"},
+    {"id":"e_f8","fromNode":"center","fromSide":"bottom","toNode":"form8","toSide":"top"},
+    {"id":"e_f9","fromNode":"center","fromSide":"bottom","toNode":"form9","toSide":"top"},
+
+    {"id":"e_v1","fromNode":"form1","fromSide":"bottom","toNode":"var1","toSide":"top"},
+    {"id":"e_v2","fromNode":"form2","fromSide":"bottom","toNode":"var2","toSide":"top"},
+    {"id":"e_v3","fromNode":"form3","fromSide":"bottom","toNode":"var3","toSide":"top"},
+    {"id":"e_v4","fromNode":"form4","fromSide":"bottom","toNode":"var4","toSide":"top"},
+    {"id":"e_v5","fromNode":"form5","fromSide":"bottom","toNode":"var5","toSide":"top"},
+    {"id":"e_v6","fromNode":"form6","fromSide":"bottom","toNode":"var6","toSide":"top"},
+
+    {"id":"e_oai","fromNode":"form8","fromSide":"right","toNode":"openai_pkg","toSide":"left"},
+    {"id":"e_oai1","fromNode":"openai_pkg","fromSide":"bottom","toNode":"oai_pitch","toSide":"top"},
+    {"id":"e_oai2","fromNode":"openai_pkg","fromSide":"bottom","toNode":"oai_exec","toSide":"top"},
+    {"id":"e_oai3","fromNode":"oai_pitch","fromSide":"bottom","toNode":"oai_evid","toSide":"top"},
+    {"id":"e_oai4","fromNode":"oai_exec","fromSide":"bottom","toNode":"oai_email","toSide":"top"},
+    {"id":"e_oai5","fromNode":"oai_evid","fromSide":"bottom","toNode":"oai_36d","toSide":"top"},
+    {"id":"e_oai6","fromNode":"oai_email","fromSide":"bottom","toNode":"oai_pixel","toSide":"top"},
+
+    {"id":"e_names","fromNode":"names","fromSide":"right","toNode":"center","toSide":"left"}
+  ]
+}

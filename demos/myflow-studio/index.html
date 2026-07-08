@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyFlow STUDIO — Demo | IArtLabs</title>
+  <meta name="description" content="Estudio vocal con IA: beats, efectos, gestos y grabación. Demo de IArtLabs." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #060608; color: #F3EBDD; }
+    .brand { color: #FFB81C; }
+    .btn-primary { background: #FFB81C; color: #060608; }
+    .btn-primary:hover { background: #e6a517; }
+    .btn-outline { border: 1px solid #FFB81C; color: #FFB81C; }
+    .card { background: #0f0f13; border: 1px solid #2a2a30; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .status-dot.on { background: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
+    .status-dot.off { background: #FF3B5C; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <header class="border-b border-white/10">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="/" class="text-xl font-black tracking-tight">IArtLabs<span class="brand">.</span></a>
+      <nav class="hidden md:flex gap-6 text-sm text-gray-400">
+        <a href="/" class="hover:text-white transition-colors">Inicio</a>
+        <a href="/demos/myflow-studio/" class="text-white">MyFlow STUDIO</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-10">
+    <section class="text-center mb-16">
+      <span class="brand font-mono text-xs tracking-widest uppercase">Demo en vivo</span>
+      <h1 class="text-4xl md:text-6xl font-black mt-3 mb-4">MyFlow <span class="brand">STUDIO</span></h1>
+      <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+        Estudio vocal con IA: beats generados por MusicGen, efectos de coro, armonías, metrónomo, afinador y grabación vertical. Controlado por gestos de mano.
+      </p>
+      <div class="flex flex-wrap justify-center gap-4 mt-8">
+        <a id="launchBtn" href="#" class="btn-primary px-8 py-4 rounded-xl font-bold text-lg transition-colors">
+          Lanzar STUDIO
+        </a>
+        <a href="https://github.com/ART449/myflow-studio-morph" target="_blank" class="btn-outline px-8 py-4 rounded-xl font-bold text-lg transition-colors">
+          Ver código
+        </a>
+      </div>
+      <div class="mt-6 flex justify-center items-center gap-2 text-sm text-gray-400">
+        <span id="statusDot" class="status-dot off"></span>
+        <span id="statusText">Verificando disponibilidad del demo…</span>
+      </div>
+    </section>
+
+    <section class="grid md:grid-cols-3 gap-6 mb-16">
+      <div class="card rounded-2xl p-6">
+        <div class="text-3xl mb-3">🎙️</div>
+        <h3 class="text-lg font-bold mb-2">Voz en vivo</h3>
+        <p class="text-gray-400 text-sm">Pitch correction, armonías automáticas, 3 voces y grabación WAV + video vertical.</p>
+      </div>
+      <div class="card rounded-2xl p-6">
+        <div class="text-3xl mb-3">🥁</div>
+        <h3 class="text-lg font-bold mb-2">Beat IA</h3>
+        <p class="text-gray-400 text-sm">Genera beats con MusicGen. Elige estilo, BPM y duración. Se reproduce mientras cantas.</p>
+      </div>
+      <div class="card rounded-2xl p-6">
+        <div class="text-3xl mb-3">🖐️</div>
+        <h3 class="text-lg font-bold mb-2">Gestos</h3>
+        <p class="text-gray-400 text-sm">Controla grabación, beats y estilos con la mano. Ideal para sesiones creativas sin tocar la pantalla.</p>
+      </div>
+    </section>
+
+    <section class="card rounded-2xl p-6 md:p-8 mb-16">
+      <h2 class="text-2xl font-bold mb-6 brand">Cómo usar el demo</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <h3 class="font-semibold mb-3">Controles táctiles</h3>
+          <ul class="text-gray-400 text-sm space-y-2">
+            <li>• Pulsa <strong class="text-white">INICIAR</strong> y permite cámara + micrófono.</li>
+            <li>• Usa <strong class="text-white">REC</strong> para grabar, <strong class="text-white">Cal CERR/ABI</strong> para calibrar.</li>
+            <li>• Pulsa <strong class="text-white">🥁</strong> para abrir Beat IA y generar un beat.</li>
+            <li>• El botón <strong class="text-white">🎧</strong> activa modo calentamiento con metrónomo y afinador.</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-3">Gestos de mano</h3>
+          <ul class="text-gray-400 text-sm space-y-2">
+            <li>✊ Puño cerrado + bajar = grabar/detener</li>
+            <li>✋ Palma abierta = detener todo</li>
+            <li>👍 Pulgar arriba = play/pause beat</li>
+            <li>☝ Anular extendido = abrir/cerrar Beat IA</li>
+            <li>👌 Pulgar+índice círculo = generar beat</li>
+            <li>✌ Índice+medio = cambiar estilo de beat</li>
+          </ul>
+        </div>
+      </div>
+      <p class="text-gray-500 text-sm mt-6">
+        Nota: en móviles, el navegador requiere HTTPS para acceder a cámara y micrófono. Si el demo local no funciona en tu celular, usa Tailscale o un túnel seguro.
+      </p>
+    </section>
+
+    <section class="text-center">
+      <p class="text-gray-500 text-sm">
+        MyFlow STUDIO es parte de <a href="/" class="brand hover:underline">IArtLabs</a> / <a href="https://github.com/ART449/byflow-area-musica" target="_blank" class="brand hover:underline">ByFlow</a>.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    // Configura aquí la URL del STUDIO desplegado
+    const STUDIO_URL = 'http://100.95.85.107:8774/';
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    const launchBtn = document.getElementById('launchBtn');
+
+    launchBtn.href = STUDIO_URL;
+
+    fetch(STUDIO_URL + 'api/health', { method: 'GET', mode: 'no-cors' })
+      .then(() => {
+        statusDot.classList.remove('off');
+        statusDot.classList.add('on');
+        statusText.textContent = 'Demo disponible. Pulsa Lanzar STUDIO.';
+      })
+      .catch(() => {
+        statusText.textContent = 'Demo offline o en red privada. Conecta Tailscale o usa localhost.';
+      });
+  </script>
+</body>
+</html>

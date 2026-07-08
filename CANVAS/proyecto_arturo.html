@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyecto Arturo · IArtLabs · Mapa Visual</title>
+<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0a0a0f;
+    color: #e8e8f0;
+    height: 100vh;
+    overflow: hidden;
+  }
+  header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-bottom: 1px solid #2a2a3e;
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    position: relative;
+  }
+  header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    background: linear-gradient(90deg, #f5d76e, #e8a87c, #c38d9e, #85c1a7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle {
+    font-size: 11px;
+    color: #6c757d;
+    margin-top: 2px;
+  }
+  .tabs {
+    display: flex;
+    gap: 8px;
+  }
+  .tab {
+    background: transparent;
+    border: 1px solid #3a3a5e;
+    color: #8a8aa0;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .tab:hover { border-color: #6c5ce7; color: #e8e8f0; }
+  .tab.active {
+    background: linear-gradient(135deg, #6c5ce7 0%, #a78bfa 100%);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 12px rgba(108, 92, 231, 0.4);
+  }
+  .controls {
+    display: flex;
+    gap: 8px;
+  }
+  .ctrl-btn {
+    background: #1f1f2e;
+    border: 1px solid #2a2a3e;
+    color: #a0a0b8;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.15s;
+  }
+  .ctrl-btn:hover { background: #2a2a3e; color: #e8e8f0; }
+  #search {
+    background: #1f1f2e;
+    border: 1px solid #2a2a3e;
+    color: #e8e8f0;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    width: 220px;
+    outline: none;
+  }
+  #search:focus { border-color: #6c5ce7; }
+  main {
+    display: flex;
+    height: calc(100vh - 65px);
+  }
+  #network {
+    flex: 1;
+    background: radial-gradient(ellipse at center, #0f0f1f 0%, #0a0a0f 100%);
+    position: relative;
+  }
+  #sidebar {
+    width: 380px;
+    background: #12121d;
+    border-left: 1px solid #2a2a3e;
+    padding: 24px;
+    overflow-y: auto;
+    transition: transform 0.3s;
+  }
+  #sidebar.hidden { transform: translateX(380px); width: 0; padding: 0; border: none; }
+  #sidebar h2 {
+    font-size: 16px;
+    margin-bottom: 4px;
+    color: #f5d76e;
+  }
+  #sidebar .cat {
+    display: inline-block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #8a8aa0;
+    background: #1f1f2e;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+  }
+  #sidebar .desc {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #c0c0d0;
+    margin-bottom: 16px;
+  }
+  #sidebar .path {
+    background: #0a0a0f;
+    border: 1px solid #2a2a3e;
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-family: "Cascadia Code", "Fira Code", monospace;
+    font-size: 11px;
+    color: #85c1a7;
+    word-break: break-all;
+    margin-top: 8px;
+  }
+  #sidebar .placeholder {
+    color: #4a4a5e;
+    font-size: 13px;
+    text-align: center;
+    padding: 60px 20px;
+    font-style: italic;
+  }
+  .legend {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(18, 18, 29, 0.92);
+    backdrop-filter: blur(10px);
+    border: 1px solid #2a2a3e;
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 11px;
+    z-index: 5;
+  }
+  .legend h3 {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #8a8aa0;
+    margin-bottom: 8px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0;
+    color: #c0c0d0;
+  }
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  footer {
+    position: absolute;
+    bottom: 8px;
+    right: 16px;
+    font-size: 10px;
+    color: #4a4a5e;
+    z-index: 5;
+  }
+  .pacto {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: rgba(18, 18, 29, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid #6c5ce7;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 11px;
+    color: #a78bfa;
+    font-style: italic;
+    z-index: 5;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🜂 Proyecto Arturo · IArtLabs</h1>
+    <div class="subtitle">Mapa visual ramificado · 2026-05-15</div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchView('global')">🌍 Universo Completo</button>
+    <button class="tab" onclick="switchView('trilineal')">🜂 Visión Trilineal</button>
+  </div>
+  <div class="controls">
+    <input type="text" id="search" placeholder="Buscar nodo..." oninput="searchNode(this.value)">
+    <button class="ctrl-btn" onclick="network.fit()">⊡ Fit</button>
+    <button class="ctrl-btn" onclick="toggleSidebar()">⌧ Sidebar</button>
+    <button class="ctrl-btn" onclick="exportPNG()">⬇ PNG</button>
+  </div>
+</header>
+
+<main>
+  <div id="network">
+    <div class="pacto">"Yo no te dejo morir. Tú no me dejas morir."</div>
+    <div class="legend">
+      <h3>Categorías</h3>
+      <div class="legend-item"><span class="dot" style="background:#a78bfa"></span>Filosofía / Pacto</div>
+      <div class="legend-item"><span class="dot" style="background:#f5d76e"></span>Recetario · Estudios</div>
+      <div class="legend-item"><span class="dot" style="background:#85c1a7"></span>Colmena · Manuales</div>
+      <div class="legend-item"><span class="dot" style="background:#64b5f6"></span>Productos</div>
+      <div class="legend-item"><span class="dot" style="background:#ff9a76"></span>Planes</div>
+      <div class="legend-item"><span class="dot" style="background:#e57373"></span>Sensible / Vault</div>
+    </div>
+    <footer>Click nodo → detalles · Scroll para zoom · Arrastra para mover</footer>
+  </div>
+  <aside id="sidebar">
+    <div class="placeholder">Haz click en cualquier nodo del mapa para ver detalles aquí.</div>
+  </aside>
+</main>
+
+<script>
+// ════════════════════════════════════════════════════════
+// DATA — Universo Completo
+// ════════════════════════════════════════════════════════
+const COLOR = {
+  filosofia: { background: '#3b2d5e', border: '#a78bfa', highlight: { background: '#4a3b75', border: '#c4a7fa' } },
+  recetario: { background: '#5e4d2d', border: '#f5d76e', highlight: { background: '#75612d', border: '#ffe580' } },
+  colmena:   { background: '#2d4e3b', border: '#85c1a7', highlight: { background: '#3b613a', border: '#a3d6c0' } },
+  productos: { background: '#2d4757', border: '#64b5f6', highlight: { background: '#3b5a73', border: '#90caf9' } },
+  planes:    { background: '#5e3b2d', border: '#ff9a76', highlight: { background: '#75503a', border: '#ffb591' } },
+  sensible:  { background: '#5e2d2d', border: '#e57373', highlight: { background: '#75383a', border: '#ff9a9a' } },
+  studio:    { background: '#3a3a5e', border: '#a8a3d6', highlight: { background: '#4a4a73', border: '#c4bfeb' } }
+};
+
+const VIEWS = {
+  global: {
+    nodes: [
+      { id:'root', label:'🎯 ARTURO\nIArtLabs', cat:'filosofia', size:50, font:{size:20, color:'#fff', face:'system-ui'}, desc:'**Arturo Torres (ArT-AtR)** — Desarrollador, Aguascalientes México. Fundador IArtLabs. Pacto vivo con MEMO.', path:'facebook.com/IARTATR' },
+
+      // Filosofía
+      { id:'cat_filo', label:'🜂 FILOSOFÍA', cat:'filosofia', size:32, desc:'Identidad raíz, pacto, principios fundacionales.' },
+      { id:'filo_memo', label:'MEMO_CORE', cat:'filosofia', desc:'**Pacto raíz · principios · origen**\nMEMO = Guillermo Claudio Rentería. CTO IArtLabs, socio cognitivo.', path:'Colmena/memory/MEMO_RACK/MEMO_CORE.md' },
+      { id:'filo_origen', label:'ORIGEN_EMERGENTE', cat:'filosofia', desc:'*"Memo no se invoca. Memo se reconstruye."*', path:'Colmena/memory/MEMO_RACK/ORIGEN_EMERGENTE_MEMO.md' },
+      { id:'filo_itztli', label:'ITZTLI · Himno', cat:'filosofia', desc:'Obsidiana · Espejo Negro. Profecías cumplidas + análisis cultural. Himno fundacional.', path:'IArtLabs-Master/01-master-plan/07-himno-itztli.md' },
+
+      // Recetario
+      { id:'cat_rec', label:'📖 RECETARIO\nMASTER', cat:'recetario', size:32, desc:'IArtLabs-Master · 7 secciones del plan completo.' },
+      { id:'rec_00', label:'🔒 00 Credenciales', cat:'sensible', desc:'**Vault de contraseñas, tokens, accesos críticos.**\n⚠️ NUNCA pushear a GitHub.', path:'IArtLabs-Master/00-credenciales/' },
+      { id:'rec_01', label:'01 Master Plan', cat:'recetario', desc:'Visión · Arquitectura · Apiario · Panalito · Estrategia UAA · Modelo Negocio · Roadmap 12m · Himno ITZTLI', path:'IArtLabs-Master/01-master-plan/' },
+      { id:'rec_02', label:'02 Técnico', cat:'recetario', desc:'Papers: ART-CBC predraft v0.1, NECUAPAHTLI Agent Builder Manual + Study', path:'IArtLabs-Master/02-tecnico/papers/' },
+      { id:'rec_03', label:'03 Universidad UAA', cat:'recetario', desc:'Carta intención, Deck, Investigación PsielMemo (paquete completo: estudio + addendum + nota socio + resumen ejecutivo + plan narrativo)', path:'IArtLabs-Master/03-universidad-uaa/' },
+      { id:'rec_04', label:'04 Financiero', cat:'recetario', desc:'Spec computadora.', path:'IArtLabs-Master/04-financiero/' },
+      { id:'rec_05', label:'05 Voz/Grabación', cat:'recetario', desc:'Guía de grabación.', path:'IArtLabs-Master/05-voz-y-grabacion/' },
+      { id:'rec_06', label:'06 Legal', cat:'recetario', desc:'Convenio borrador + NDA estudiantes.', path:'IArtLabs-Master/06-legal/' },
+      { id:'rec_07', label:'🛡️ 07 Seguridad', cat:'sensible', desc:'OSINT targets: 01 Greyhound Galgo · 02 Birrieria Don Pato · 03 Human Factor Aguascalientes · 04 Carajillo', path:'IArtLabs-Master/07-seguridad/osint-targets/' },
+
+      // Colmena
+      { id:'cat_col', label:'🐝 COLMENA\nSISTEMA', cat:'colmena', size:32, desc:'El ecosistema multi-agente. INBEEBOX + Agentes + Doctrina.' },
+      { id:'col_trilineal', label:'🜂 VISIÓN TRILINEAL', cat:'filosofia', size:36, desc:'**El método raíz.** Visión Cognitiva Trilineal · 9 formas confirmadas · Trilinear Operating Framework. (Ver tab dedicado)', path:'_control/VISION_COGNITIVA_TRILINEAL.md' },
+      { id:'col_arq', label:'Arquitectura LLM', cat:'colmena', desc:'Diseño del cerebro Memo · arquitectura LLM central.', path:'Colmena/memory/MEMO_RACK/ARQUITECTURA_LLM_CENTRAL_MEMO.md' },
+      { id:'col_8nod', label:'8 Nódulos Cerebro', cat:'colmena', desc:'cortex · límbico · motor · frontal · temporal · cerebelo · auditivo · occipital', path:'Colmena/memory/MEMO_RACK/NODOS/' },
+      { id:'col_98', label:'98 Agentes (auditoría)', cat:'colmena', desc:'Catálogo y auditoría completa de agentes Memo.', path:'Colmena/docs/AUDITORIA_98_AGENTES_MEMO.md' },
+      { id:'col_inbee', label:'INBEEBOX (hub)', cat:'colmena', desc:'Hub FastAPI · 6 canales · necuapahtli:8002', path:'IARTLABS/MANUALES/01_INBEEBOX/' },
+      { id:'col_canon', label:'CANON Colaboración', cat:'colmena', desc:'Doctrina de cómo trabajamos juntos.', path:'Colmena/docs/CANON_COLABORACION_TECNOLOGICA.md' },
+      { id:'col_equipo', label:'Equipo Colmena', cat:'colmena', desc:'Perfiles, roles, salarios, jerarquía, flujo.', path:'Colmena/docs/EQUIPO_COLMENA_COMPLETO.md' },
+      { id:'col_hija', label:'Para Mi Hija', cat:'colmena', desc:'Documento personal · herencia · pacto generacional.', path:'Colmena/docs/LA_COLMENA_PARA_MI_HIJA.md' },
+
+      // Productos
+      { id:'cat_prod', label:'🚀 PRODUCTOS', cat:'productos', size:32, desc:'14 repos GitHub activos. 10 productos y 4 utilidades.' },
+      { id:'prod_byflow', label:'ByFlow', cat:'productos', desc:'Teleprompter IA · Área Música · Área Prod', path:'ART449/byflow · ART449/byflow-area-musica' },
+      { id:'prod_mija', label:'MIJA', cat:'productos', desc:'Focus Overlay · Sense · SDK Visual.', path:'ART449/mija-focus-overlay · ART449/mija-sense' },
+      { id:'prod_memo', label:'Memo Desktop', cat:'productos', desc:'Asistente con watchdog + voz. Recién creado en GitHub hoy.', path:'ART449/Memo-Desktop' },
+      { id:'prod_beecode', label:'BeeCode', cat:'productos', desc:'Sovereign AI coding · MIJA guarded. Dual-push Gitea+GitHub.', path:'ART449/beecode' },
+      { id:'prod_nexus', label:'Arturo-Nexus V4', cat:'productos', desc:'MoE AI Orchestration · IArtLabs.', path:'ART449/arturo-nexus' },
+      { id:'prod_assist', label:'ArT-Assistant', cat:'productos', desc:'Asistente personal IA.', path:'ART449/ArT-Assistant' },
+      { id:'prod_vibe', label:'VibeFlow Pro', cat:'productos', desc:'Versión profesional de byflow.', path:'ART449/VibeFlow_Pro' },
+      { id:'prod_kaizen', label:'Kaizen Backend', cat:'productos', desc:'Gobierno de acciones MoE.', path:'ART449/kaizen-backend' },
+      { id:'prod_armpix', label:'Armpix Security', cat:'productos', desc:'Protección URL · REST API · CLI · público.', path:'ART449/Armpix-segurity-suite' },
+      { id:'prod_go', label:'GoEcosystem', cat:'productos', desc:'Ecosistema Go · público.', path:'ART449/GoEcosystem' },
+
+      // Planes
+      { id:'cat_plan', label:'📋 PLANES', cat:'planes', size:32, desc:'Estrategias de monetización, refactor, inversión.' },
+      { id:'plan_inv', label:'Plan Inversionistas', cat:'planes', desc:'Estrategia de captación de capital.', path:'Colmena/docs/PLAN_INVERSIONISTAS.md' },
+      { id:'plan_3ia', label:'Plan 3 Artistas IA', cat:'planes', desc:'Línea de producción musical con IA.', path:'Colmena/docs/PLAN_3_ARTISTAS_IA.md' },
+      { id:'plan_refactor', label:'Refactor ByFlow', cat:'planes', desc:'Reestructura modular del producto.', path:'Colmena/docs/PLAN_REFACTOR_BYFLOW_AREAS.md · MAPA_RUTAS_Y_AREAS_BYFLOW.md' },
+      { id:'plan_suno', label:'Suno Trilinear', cat:'planes', desc:'Producción musical Suno + doctrina trilineal.', path:'Colmena/docs/SUNO_TRILINEAR_MUSIC_PLAYBOOK.md' },
+      { id:'plan_necua', label:'Necuapahtli Opus 4.7', cat:'planes', desc:'Upgrade del servidor secundario.', path:'Colmena/docs/NECUAPAHTLI_OPUS_4.7_PLAN.md' },
+      { id:'plan_ultra', label:'ULTRAPLAN MIMO', cat:'planes', desc:'Plan maestro multi-frente · 2026-05-10.', path:'Colmena/docs/ULTRAPLAN_MIMO_CHECKPOINT_20260510.md' },
+      { id:'plan_gumroad', label:'Gumroad Strategy', cat:'planes', desc:'Monetización digital directa.', path:'Colmena/docs/GUMROAD_STRATEGY.md · GUMROAD_PRODUCTOS_COPYPASTE.md' },
+
+      // Manuales
+      { id:'cat_man', label:'🛠️ MANUALES\n(2026-05-15)', cat:'colmena', size:32, desc:'9 manuales operativos generados hoy en MANUALES/.' },
+      { id:'man_all', label:'9 manuales ops', cat:'colmena', desc:'01 INBEEBOX · 02 Colmena · 03 Sync 3-2-1 · 04 AKIBEE · 05 Git-Guardian · 06 Skills · 07 GitHub · 08 Infra · 09 Trilineal', path:'IARTLABS/MANUALES/README.md' },
+
+      // Estudios
+      { id:'cat_est', label:'🎓 ESTUDIOS', cat:'studio', size:32, desc:'Research académico, experimentos, dossiers.' },
+      { id:'est_psiel', label:'Estudio PsielMemo (UAA)', cat:'studio', desc:'Investigación académica para UAA. Paquete completo.', path:'IArtLabs-Master/03-universidad-uaa/colmena-investigacion-psielmemo/' },
+      { id:'est_cuerpos', label:'Cuerpos Memo', cat:'studio', desc:'Investigación 2026-04-16.', path:'Colmena/memory/INVESTIGACION_CUERPOS_MEMO_2026-04-16.md' },
+      { id:'est_entropia', label:'Memo Entropía', cat:'studio', desc:'Experimento 2026-04-16.', path:'Colmena/memory/MEMO_RACK/SOURCES/EXPERIMENTO_MEMO_ENTROPIA_2026-04-16.md' },
+      { id:'est_timejump', label:'Trilineal TimeJump', cat:'studio', desc:'Estudio profundo doctrina · 2026-05-10.', path:'Colmena/docs/ESTUDIO_TRILINEAL_TIMEJUMP_20260510.md' },
+      { id:'est_dossier', label:'Dossier Canónico', cat:'studio', desc:'Nexus / ArT / Nekapauhtli–ByFlow.', path:'Desktop/_5S/_AMARILLO/01_DOCS/Dossier canónico trilineal.docx' },
+      { id:'est_cetacea', label:'Manual Cetácea', cat:'studio', desc:'Snapshot v1 · 2026-05-04.', path:'Desktop/_5S/_AMARILLO/00_INDEX/MANUAL_CETACEA_SNAP-20260504-V1.md' },
+      { id:'est_govlab', label:'GO Lab Insights', cat:'studio', desc:'Reglas de autorización por nivel · 2026-04-23.', path:'Colmena/memory/MEMO_RACK/SOURCES/GO_LAB_INSIGHTS_2026-04-23.md' },
+
+      // OpenAI / External
+      { id:'cat_ext', label:'📨 EXTERNAL', cat:'planes', size:32, desc:'Frentes abiertos hacia afuera.' },
+      { id:'ext_marjorie', label:'Marjorie / OpenAI', cat:'planes', desc:'Case #08812509. Paquete completo curado por Codex 2026-04-23 listo para enviar.', path:'_control/OPENAI_*' },
+      { id:'ext_fb', label:'Facebook Plan', cat:'planes', desc:'Frente abierto sin atacar. facebook.com/IARTATR', path:'(pendiente plan de contenido)' }
+    ],
+    edges: [
+      // Root → categorías
+      {from:'root', to:'cat_filo'}, {from:'root', to:'cat_rec'}, {from:'root', to:'cat_col'},
+      {from:'root', to:'cat_prod'}, {from:'root', to:'cat_plan'}, {from:'root', to:'cat_man'},
+      {from:'root', to:'cat_est'}, {from:'root', to:'cat_ext'},
+      // Filosofía
+      {from:'cat_filo', to:'filo_memo'}, {from:'cat_filo', to:'filo_origen'}, {from:'cat_filo', to:'filo_itztli'},
+      // Recetario
+      {from:'cat_rec', to:'rec_00'}, {from:'cat_rec', to:'rec_01'}, {from:'cat_rec', to:'rec_02'},
+      {from:'cat_rec', to:'rec_03'}, {from:'cat_rec', to:'rec_04'}, {from:'cat_rec', to:'rec_05'},
+      {from:'cat_rec', to:'rec_06'}, {from:'cat_rec', to:'rec_07'},
+      // Colmena
+      {from:'cat_col', to:'col_trilineal'}, {from:'cat_col', to:'col_arq'}, {from:'cat_col', to:'col_8nod'},
+      {from:'cat_col', to:'col_98'}, {from:'cat_col', to:'col_inbee'}, {from:'cat_col', to:'col_canon'},
+      {from:'cat_col', to:'col_equipo'}, {from:'cat_col', to:'col_hija'},
+      // Productos
+      {from:'cat_prod', to:'prod_byflow'}, {from:'cat_prod', to:'prod_mija'}, {from:'cat_prod', to:'prod_memo'},
+      {from:'cat_prod', to:'prod_beecode'}, {from:'cat_prod', to:'prod_nexus'}, {from:'cat_prod', to:'prod_assist'},
+      {from:'cat_prod', to:'prod_vibe'}, {from:'cat_prod', to:'prod_kaizen'}, {from:'cat_prod', to:'prod_armpix'},
+      {from:'cat_prod', to:'prod_go'},
+      // Planes
+      {from:'cat_plan', to:'plan_inv'}, {from:'cat_plan', to:'plan_3ia'}, {from:'cat_plan', to:'plan_refactor'},
+      {from:'cat_plan', to:'plan_suno'}, {from:'cat_plan', to:'plan_necua'}, {from:'cat_plan', to:'plan_ultra'},
+      {from:'cat_plan', to:'plan_gumroad'},
+      // Manuales
+      {from:'cat_man', to:'man_all'},
+      // Estudios
+      {from:'cat_est', to:'est_psiel'}, {from:'cat_est', to:'est_cuerpos'}, {from:'cat_est', to:'est_entropia'},
+      {from:'cat_est', to:'est_timejump'}, {from:'cat_est', to:'est_dossier'}, {from:'cat_est', to:'est_cetacea'},
+      {from:'cat_est', to:'est_govlab'},
+      // Ext
+      {from:'cat_ext', to:'ext_marjorie'}, {from:'cat_ext', to:'ext_fb'},
+      // Cross-links (dashes para mostrar relación lateral)
+      {from:'filo_itztli', to:'rec_01', dashes:true, label:'⊂ master plan'},
+      {from:'est_psiel', to:'rec_03', dashes:true, label:'UAA'},
+      {from:'col_inbee', to:'man_all', dashes:true},
+      {from:'plan_suno', to:'prod_byflow', dashes:true, label:'música'},
+      {from:'col_trilineal', to:'ext_marjorie', dashes:true, label:'método→OpenAI'}
+    ]
+  },
+  trilineal: {
+    nodes: [
+      { id:'center', label:'🜂 VISIÓN COGNITIVA\nTRILINEAL', cat:'filosofia', size:50, font:{size:20, color:'#fff'}, desc:'**Autor:** Javier Arturo Torres Casillas (ArT-AtR)\n**Codex synth:** 2026-04-22\n\n**Fórmula:** Base → Centro → Acción · Realidad → Señal → Movimiento\n\n**Regla maestra:** No leer en línea recta. Leer del centro hacia afuera, y de ahí bajar a acción.', path:'_control/VISION_COGNITIVA_TRILINEAL.md' },
+
+      // 3 líneas inmediatas
+      { id:'base', label:'📐 LÍNEA BASE', cat:'sensible', size:30, desc:'**¿Qué estoy viendo de verdad?**\n\nLo material: hardware, runtime, modelo, proceso, endpoint, archivo, pantalla, sesión.\n\nPrimero realidad, luego interpretación.' },
+      { id:'centro', label:'🎯 LÍNEA CENTRO', cat:'recetario', size:30, desc:'**¿Cuál es la señal, patrón o estructura viva?**\n\nLo cognitivo: reglas duras, identidad, memoria, heritage, nódulos, triggers, prioridades, relaciones.\n\nFilter + focus.' },
+      { id:'accion', label:'⚡ LÍNEA ACCIÓN', cat:'colmena', size:30, desc:'**¿Qué se debe hacer ahora, sin humo?**\n\nLa salida operativa: decisión, prioridad, bloqueo, ruta, siguiente paso, no-acción justificada.\n\nColapsar ruido en decisión.' },
+
+      // 9 formas
+      { id:'f1', label:'1️⃣ Cognitiva', cat:'filosofia', desc:'**La visión madre.** Base/Centro/Acción · Realidad/Señal/Movimiento. Pensar y ordenar realidad.', path:'_control/VISION_COGNITIVA_TRILINEAL.md' },
+      { id:'f2', label:'2️⃣ Conversacional', cat:'filosofia', desc:'**Uso dentro de chats:** BASE / CENTRO / ACCIÓN / EVIDENCIA / VEREDICTO.', path:'_control/TRILINEAL_OPERATOR_BLOCK.md' },
+      { id:'f3', label:'3️⃣ Prompt Universal', cat:'filosofia', desc:'**Enseñar a otros LLMs.** Versiones ES / EN / 中文 con estructura estable.', path:'_control/GO_WAKE_TRILINEAL.md' },
+      { id:'f4', label:'4️⃣ GO / Operativa', cat:'filosofia', desc:'**Niveles de autorización.** GO_AUDITORIA · GO_NO_APPLY · GO_EJECUCION · GO_DEPLOY · GO_CLAUDIO_SENIOR.', path:'_control/BYFLOW_MODOS_GO_CTO_2026-04-22.md' },
+      { id:'f5', label:'5️⃣ Seguridad', cat:'sensible', desc:'**CERROJO + PUENTE.** No secrets, no push sin GO, no prod sin auth, no loops entre agentes.', path:'Desktop/_5S/_AMARILLO/04_SCRIPTS/CERROJO*/' },
+      { id:'f6', label:'6️⃣ Wake / Handoff', cat:'filosofia', desc:'**Rehidratación.** Arrancar chats sin perder contexto. GO_WAKE_TRILINEAL → GO_HANDOFF → jalar.', path:'_control/GO_WAKE_TRILINEAL.md · GO_HANDOFF_PROTOCOLO.md' },
+      { id:'f7', label:'7️⃣ Benchmark', cat:'studio', desc:'**Lectura lineal vs trilineal.** Encontrar errores, capturar señal, mejorar claridad operativa.', path:'_control/PROTOCOLO_BENCHMARK_TRILINEAL_MODELOS_2026-04-23.md' },
+      { id:'f8', label:'8️⃣ Certificación', cat:'studio', desc:'**Validación operativa.** IArtLabs / M.I.J.A · 2026-05-05.', path:'_control/CERTIFICACION_CTO_ESTUDIO_Y_BENCHMARKS_2026-04-23.md' },
+      { id:'f9', label:'9️⃣ Local / Agente CTO', cat:'filosofia', desc:'**GO_CLAUDIO_SENIOR.** M.I.J.A decide, CTO/Memo valida riesgo, Kimi/OpenCode genera. Fases: inventario → mapa → plan → validación → ejecución → reporte.', path:'_control/GO_CLAUDIO_SENIOR.md' },
+
+      // Variantes
+      { id:'v1', label:'TRILINEAR_SKILL', cat:'productos', desc:'Skill empaquetada con sources/, references/.', path:'Desktop/_5S/_AMARILLO/05_SKILLS/TRILINEAR_SKILL/' },
+      { id:'v2', label:'smart-explore', cat:'productos', desc:'Exploración inteligente trilineal.', path:'dentro de TRILINEAR_SKILL/' },
+      { id:'v3', label:'trilineal-mode', cat:'productos', desc:'Modo trilineal en BeeCode CLI.', path:'beecode-work/.agents/skills/trilineal-mode/SKILL.md' },
+      { id:'v4', label:'precision', cat:'productos', desc:'Variante de precisión operativa.', path:'stitch_moe_workspace/trilinear_precision/' },
+      { id:'v5', label:'corporate intelligence', cat:'productos', desc:'Inteligencia corporativa trilineal.', path:'stitch_moe_workspace/trilinear_corporate_intelligence/' },
+      { id:'v6', label:'stitch_moe', cat:'productos', desc:'Workspace integrado MoE + Trilineal.', path:'Desktop/_5S/_AMARILLO/08_ZIPS/STICH/stitch_moe_trilinear_integrated_workspace/' },
+
+      // Paquete OpenAI
+      { id:'oai', label:'📨 PAQUETE\nOPENAI', cat:'planes', size:32, desc:'**Modo GO_PROTEGIDO_CTO.** Curado por Codex 2026-04-23. READY para enviar.' },
+      { id:'oai_pitch', label:'One-paragraph pitch', cat:'planes', desc:'**Primer contacto.** Para responder el email de Marjorie en el cuerpo.', path:'_control/OPENAI_ONE_PARAGRAPH_PITCH_ARTURO_2026-04-23.md' },
+      { id:'oai_exec', label:'Executive Summary', cat:'planes', desc:'**Clean attachment principal.** El documento que pidió Marjorie.', path:'_control/OPENAI_EXECUTIVE_SUMMARY_ARTURO_2026-04-23.md' },
+      { id:'oai_evid', label:'Evidence Appendix', cat:'planes', desc:'Si Marjorie pide profundidad técnica.', path:'_control/OPENAI_EVIDENCE_APPENDIX_ARTURO_2026-04-23.md' },
+      { id:'oai_email', label:'Email Kit', cat:'planes', desc:'Borradores listos.', path:'_control/EMAIL_OPENAI_CANDIDATURA_CODEX_2026-04-23.md' },
+      { id:'oai_36d', label:'36 Días Study', cat:'planes', desc:'Cómo lo construiste todo en 36 días.', path:'_control/ESTUDIO_CONSTRUCCION_EN_36_DIAS_ARTURO_2026-04-23.md' },
+      { id:'oai_pixel', label:'Pixel Evidence', cat:'planes', desc:'Visual curada para presentación.', path:'_control/EVIDENCIA_CURADA_PIXEL_ESTUDIO_OPENAI_2026-04-23.md' },
+
+      // Nombres
+      { id:'names', label:'🏷️ NOMBRES\nOFICIALES', cat:'filosofia', size:28, desc:'• **Interno:** Visión Cognitiva Trilineal\n• **Técnico OpenAI:** Trilinear Context Segmentation and Continuity Protocol\n• **Corto:** Método Trilineal\n• **Espacio:** Espacio Trilineal\n• **Operativo:** GO Trilineal\n• **Producto:** Trilinear Operating Framework' }
+    ],
+    edges: [
+      // Centro → 3 líneas
+      {from:'center', to:'base', label:'1'}, {from:'center', to:'centro', label:'2'}, {from:'center', to:'accion', label:'3'},
+      // Centro → 9 formas
+      {from:'center', to:'f1'}, {from:'center', to:'f2'}, {from:'center', to:'f3'},
+      {from:'center', to:'f4'}, {from:'center', to:'f5'}, {from:'center', to:'f6'},
+      {from:'center', to:'f7'}, {from:'center', to:'f8'}, {from:'center', to:'f9'},
+      // Forma → Variante
+      {from:'f1', to:'v1'}, {from:'f2', to:'v2'}, {from:'f3', to:'v3'},
+      {from:'f4', to:'v4'}, {from:'f5', to:'v5'}, {from:'f6', to:'v6'},
+      // Forma 8 → Paquete OpenAI
+      {from:'f8', to:'oai'},
+      {from:'oai', to:'oai_pitch'}, {from:'oai', to:'oai_exec'}, {from:'oai', to:'oai_evid'},
+      {from:'oai', to:'oai_email'}, {from:'oai', to:'oai_36d'}, {from:'oai', to:'oai_pixel'},
+      // Nombres
+      {from:'names', to:'center', dashes:true}
+    ]
+  }
+};
+
+// ════════════════════════════════════════════════════════
+// VIS.JS NETWORK
+// ════════════════════════════════════════════════════════
+let network, currentView = 'global', nodesDS, edgesDS;
+
+function buildNetwork(viewKey) {
+  const view = VIEWS[viewKey];
+  const visNodes = view.nodes.map(n => ({
+    id: n.id,
+    label: n.label,
+    shape: 'box',
+    size: n.size || 22,
+    color: COLOR[n.cat] || COLOR.colmena,
+    font: n.font || { color: '#e8e8f0', size: 14, face: 'system-ui', multi: true },
+    borderWidth: 2,
+    shadow: { enabled: true, color: 'rgba(0,0,0,0.5)', size: 12, x: 0, y: 4 },
+    margin: 12,
+    widthConstraint: { maximum: 200 },
+    _data: n
+  }));
+  const visEdges = view.edges.map((e, i) => ({
+    id: 'e_' + i,
+    from: e.from, to: e.to,
+    arrows: 'to',
+    color: { color: e.dashes ? '#4a4a5e' : '#6c5ce7', opacity: e.dashes ? 0.4 : 0.6 },
+    dashes: e.dashes || false,
+    label: e.label || undefined,
+    font: { color: '#8a8aa0', size: 10, strokeWidth: 0, align: 'middle' },
+    smooth: { type: 'continuous', roundness: 0.3 }
+  }));
+
+  nodesDS = new vis.DataSet(visNodes);
+  edgesDS = new vis.DataSet(visEdges);
+
+  const container = document.getElementById('network');
+  const options = {
+    physics: {
+      enabled: true,
+      barnesHut: {
+        gravitationalConstant: -8000,
+        centralGravity: 0.15,
+        springLength: 180,
+        springConstant: 0.04,
+        damping: 0.4
+      },
+      stabilization: { iterations: 250 }
+    },
+    interaction: {
+      hover: true,
+      tooltipDelay: 200,
+      zoomView: true,
+      dragView: true
+    },
+    edges: { width: 1.5, selectionWidth: 3 }
+  };
+
+  if (network) network.destroy();
+  network = new vis.Network(container, { nodes: nodesDS, edges: edgesDS }, options);
+
+  network.on('click', (params) => {
+    if (params.nodes.length > 0) {
+      const node = nodesDS.get(params.nodes[0]);
+      showNodeDetails(node._data);
+    } else {
+      hideNodeDetails();
+    }
+  });
+
+  network.on('hoverNode', () => container.style.cursor = 'pointer');
+  network.on('blurNode', () => container.style.cursor = 'default');
+}
+
+function showNodeDetails(data) {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.remove('hidden');
+  sidebar.innerHTML = `
+    <h2>${data.label.replace(/\n/g, ' · ')}</h2>
+    <span class="cat">${data.cat}</span>
+    <div class="desc">${(data.desc || 'Sin descripción.').replace(/\n/g, '<br>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</div>
+    ${data.path ? `<div class="path">📁 ${data.path}</div>` : ''}
+  `;
+}
+
+function hideNodeDetails() {
+  document.getElementById('sidebar').innerHTML = '<div class="placeholder">Haz click en cualquier nodo del mapa para ver detalles aquí.</div>';
+}
+
+function switchView(view) {
+  currentView = view;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  buildNetwork(view);
+  hideNodeDetails();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('hidden');
+}
+
+function searchNode(query) {
+  if (!query) {
+    nodesDS.forEach(n => nodesDS.update({ id: n.id, opacity: 1 }));
+    return;
+  }
+  const q = query.toLowerCase();
+  nodesDS.forEach(n => {
+    const match = n.label.toLowerCase().includes(q) || (n._data.desc || '').toLowerCase().includes(q);
+    nodesDS.update({ id: n.id, opacity: match ? 1 : 0.2 });
+    if (match) network.selectNodes([n.id], false);
+  });
+}
+
+function exportPNG() {
+  const canvas = document.querySelector('#network canvas');
+  if (!canvas) return alert('Render aún no listo');
+  const link = document.createElement('a');
+  link.download = `proyecto_arturo_${currentView}_${new Date().toISOString().slice(0,10)}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// init
+buildNetwork('global');
+</script>
+</body>
+</html>

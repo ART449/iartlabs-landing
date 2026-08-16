@@ -19,6 +19,7 @@ Documentación operativa completa. Cada manual es autocontenido y enlaza con los
 | 06 | **Skills & Comandos** | [README](./06_SKILLS_COMANDOS/README.md) | Catálogo de slash commands y skills |
 | 07 | **GitHub Ops** | [README](./07_GITHUB_OPS/README.md) | Repos, conexiones, workflows |
 | 08 | **Infraestructura** | [README](./08_INFRAESTRUCTURA/README.md) | Mapa completo hardware/red/storage |
+| 11 | **Manifiesto & Manual GO** | [README](./11_MANIFIESTO_Y_MANUAL_OPERATIVO_GO/README.md) | Standards de ingeniería, Doctrina Trilineal y Gobierno Root |
 
 ---
 

@@ -20,6 +20,7 @@ Documentación operativa completa. Cada manual es autocontenido y enlaza con los
 | 07 | **GitHub Ops** | [README](./07_GITHUB_OPS/README.md) | Repos, conexiones, workflows |
 | 08 | **Infraestructura** | [README](./08_INFRAESTRUCTURA/README.md) | Mapa completo hardware/red/storage |
 | 11 | **Manifiesto & Manual GO** | [README](./11_MANIFIESTO_Y_MANUAL_OPERATIVO_GO/README.md) | Standards de ingeniería, Doctrina Trilineal y Gobierno Root |
+| 12 | **Análisis Comparativo vs Mercado** | [README](./12_ANALISIS_COMPARATIVO_COLMENA_VS_MERCADO/README.md) | Evaluación Colmena/BYFLOW vs SaaS/Frameworks comerciales |
 
 ---
 

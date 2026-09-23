@@ -1,0 +1,11 @@
+{
+  "name": "iartlabs-landing",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Landing IArtLabs + API JSON de OctoHype para Vercel",
+  "scripts": {
+    "dev:api": "node --experimental-strip-types scripts/dev-api.ts",
+    "verify:api": "node --experimental-strip-types scripts/verify-api.ts"
+  }
+}

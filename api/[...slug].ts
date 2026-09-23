@@ -1,4 +1,4 @@
-import { json, notFoundBody } from "./_lib/octohype.ts";
+import { json, notFoundBody } from "./_lib/octohype";
 
 /**
  * Cualquier /api/* que no tenga función propia.

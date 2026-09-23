@@ -49,7 +49,12 @@ function assert(cond: unknown, message: string): void {
 
 const server = spawn(
   process.execPath,
-  ["--experimental-strip-types", fileURLToPath(new URL("./dev-api.ts", import.meta.url))],
+  [
+    "--experimental-strip-types",
+    "--import",
+    fileURLToPath(new URL("./register-extensionless.mjs", import.meta.url)),
+    fileURLToPath(new URL("./dev-api.ts", import.meta.url)),
+  ],
   {
     env: { ...process.env, PORT: String(PORT) },
     stdio: ["ignore", "pipe", "pipe"],

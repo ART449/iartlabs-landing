@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Landing IArtLabs + API JSON de OctoHype para Vercel",
   "scripts": {
-    "dev:api": "node --experimental-strip-types scripts/dev-api.ts",
+    "dev:api": "node --experimental-strip-types --import ./scripts/register-extensionless.mjs scripts/dev-api.ts",
     "verify:api": "node --experimental-strip-types scripts/verify-api.ts"
   }
 }

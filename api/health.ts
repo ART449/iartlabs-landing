@@ -1,4 +1,4 @@
-import { json, nowIso, SERVICE, VERSION } from "./_lib/octohype.ts";
+import { json, nowIso, SERVICE, VERSION } from "./_lib/octohype";
 
 export function GET(): Response {
   return json({

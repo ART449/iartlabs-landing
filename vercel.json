@@ -1,0 +1,32 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "api.iartlabs.lat" }],
+      "destination": "/api",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/health",
+      "has": [{ "type": "host", "value": "api.iartlabs.lat" }],
+      "destination": "/api/health"
+    },
+    {
+      "source": "/octohype",
+      "has": [{ "type": "host", "value": "api.iartlabs.lat" }],
+      "destination": "/api/octohype"
+    },
+    {
+      "source": "/octohype/status",
+      "has": [{ "type": "host", "value": "api.iartlabs.lat" }],
+      "destination": "/api/octohype/status"
+    },
+    {
+      "source": "/((?!api(?:/|$)).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

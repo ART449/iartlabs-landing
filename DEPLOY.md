@@ -1,29 +1,31 @@
-# Desplegar la API OctoHype en Vercel
+# Desplegar OctoHype API en `api.iartlabs.lat`
 
-Guía corta para quien usa Vercel por primera vez. El dominio `iartlabs.lat` ya puede estar en un proyecto de Vercel. Esta guía no crea secretos ni pide Firebase.
+Guía corta para quien usa Vercel por primera vez. No hace falta Firebase ni secretos.
 
-## Qué queda publicado
+## Decisión
 
-| URL | Qué responde |
+La API va en un **proyecto Vercel nuevo**, separado del que ya tiene la home.
+
+- **No muevas `iartlabs.lat`.**
+- **No linkees este repo al proyecto que ya tiene `iartlabs.lat`.**
+- **No agregues `iartlabs.lat` en Domains de este proyecto nuevo.**
+- La home Vite (el sitio que hoy responde en `https://iartlabs.lat/`, título `frontend`) se queda donde está.
+
+Este repo se despliega solo como API, en el subdominio `api.iartlabs.lat`.
+
+## Qué vas a tener
+
+| URL | Qué pasa |
 | --- | --- |
-| `https://iartlabs.lat/` | La landing (HTML). Las rutas que no son archivos siguen cayendo en `index.html`. |
-| `https://iartlabs.lat/api/health` | JSON: `{ "ok": true, "service": "octohype-api", ... }` |
-| `https://iartlabs.lat/api` y `/api/octohype` | Catálogo de OctoHype y sus 8 tentáculos |
-| `https://iartlabs.lat/api/octohype/status` | Estado **stub** (marcador). No hay backend de tentáculos en v1. |
+| `https://api.iartlabs.lat/` | Redirect **307** a `/api` (el catálogo JSON). Vercel no puede reescribir `/` encima de `index.html`; el redirect sí corre antes. |
+| `https://api.iartlabs.lat/health` | Rewrite interno a `/api/health`. La URL no cambia. JSON. |
+| `https://api.iartlabs.lat/octohype` | Rewrite a `/api/octohype`. Catálogo. |
+| `https://api.iartlabs.lat/octohype/status` | Rewrite a `/api/octohype/status`. Estado **stub**. |
+| `https://api.iartlabs.lat/api/health` (y el resto de `/api/*`) | Las funciones, igual que siempre. |
 
-OctoHype es el orquestador de 8 tentáculos (Sentry, Nexus, Vortex, Lazarillo, BeeCode, Stripe-Gate, ThinkCentre, Victus-Gamma), igual que en [octohype.iartlabs.lat](https://octohype.iartlabs.lat/).
+Esos atajos (`/`, `/health`, `/octohype`, `/octohype/status`) solo aplican cuando el host es `api.iartlabs.lat`. En la URL `*.vercel.app` del proyecto nuevo usa `/api/...`.
 
-## Por qué `/api` devolvía HTML
-
-Hoy `https://iartlabs.lat/api` responde el shell de la SPA (`<title>frontend</title>`), con `content-type: text/html`. Eso pasa porque el proyecto de Vercel reescribe **todas** las rutas a `index.html` y no había funciones en `/api`.
-
-`vercel.json` de este repo hace el fallback de la SPA **excepto** `/api` y `/api/*`:
-
-```json
-{ "source": "/((?!api(?:/|$)).*)", "destination": "/index.html" }
-```
-
-Las funciones viven en `api/*.ts`. Vercel las publica solas (no hace falta un servidor aparte). Un archivo dentro de `api/` que empieza con `_` (`api/_lib/`) es código compartido, no una ruta.
+Los 8 tentáculos son los de [octohype.iartlabs.lat](https://octohype.iartlabs.lat/): Sentry, Nexus, Vortex, Lazarillo, BeeCode, Stripe-Gate, ThinkCentre, Victus-Gamma.
 
 ## 1. Instalar la CLI e iniciar sesión
 
@@ -34,114 +36,104 @@ npm install -g vercel
 vercel login
 ```
 
-`vercel login` abre el navegador (o te da un código) para entrar con la cuenta dueña de `iartlabs.lat`.
+`vercel login` abre el navegador (o te da un código). Entra con la cuenta dueña del DNS de `iartlabs.lat`.
 
-## 2. Enlazar este repositorio al proyecto que ya tiene el dominio
+## 2. Crear un proyecto nuevo (no el de la home)
 
-En la carpeta del repo:
+En la carpeta de este repo:
 
 ```bash
 vercel link
 ```
 
 - Elige el equipo (team) correcto.
-- Elige el proyecto **existente** donde ya está `iartlabs.lat`. No hace falta crear uno nuevo si ese proyecto ya tiene el dominio.
+- Cuando pregunte el proyecto, **créalo nuevo**. Nombre sugerido: `octohype-api` o `iartlabs-api`.
+- Si ves el proyecto que ya sirve `iartlabs.lat`, **no lo elijas**.
 
-Si Vercel crea un proyecto nuevo, el dominio no se mueve solo. Un dominio solo puede estar en un proyecto. Para pasarlo: Vercel → el proyecto viejo → Settings → Domains → quitar `iartlabs.lat`, y en el proyecto nuevo → Settings → Domains → agregarlo.
+`vercel link` solo guarda la relación en tu máquina (carpeta `.vercel/`, no se sube a git). No mueve dominios.
 
-**Ojo con la página de inicio.** El sitio que hoy responde en `iartlabs.lat` es un build de Vite cuyo `<title>` es `frontend`. Este repositorio (`ART449/iartlabs-landing`) en `/` sirve `index.html` («IArtLabs — La Colmena»), más `MANUALES/` y `demos/`. Al hacer `--prod` desde aquí, `/` pasa a ser **esta** landing. La API JSON queda en `/api`. Si el app Vite vive en otro proyecto y quieres conservarlo en el dominio, no muevas `iartlabs.lat` hasta decidir cuál de los dos es la home.
-
-## 3. Probar en tu máquina
-
-Con la CLI (el mismo runtime que producción):
-
-```bash
-vercel dev
-```
-
-Si todavía no corriste `vercel link`, esta variante no pide proyecto ni baja variables:
-
-```bash
-vercel dev --local
-```
-
-Sin cuenta de Vercel, este repo trae un servidor equivalente:
-
-```bash
-npm run dev:api
-```
-
-En otra terminal:
-
-```bash
-curl -i http://localhost:3000/api/health
-curl -i http://localhost:3000/
-curl -i http://localhost:3000/api/octohype/status
-```
-
-`/api/health` debe traer `content-type: application/json` y un cuerpo que empieza con `{`. No debe traer `<html>` ni `<title>frontend</title>`.
-
-`/` debe ser HTML de la landing.
-
-Para repetir esas comprobaciones de un jalón:
-
-```bash
-npm run verify:api
-```
-
-## 4. Preview (antes de tocar el dominio)
-
-```bash
-vercel
-```
-
-La CLI imprime una URL `https://….vercel.app`. Esa URL no reemplaza `iartlabs.lat`.
-
-```bash
-curl -i https://TU-PREVIEW.vercel.app/api/health
-curl -i https://TU-PREVIEW.vercel.app/
-```
-
-## 5. Producción
+## 3. Producción del proyecto nuevo
 
 ```bash
 vercel --prod
 ```
 
-Si el proyecto de GitHub ya está conectado en Vercel, un push a `main` también despliega. El archivo `vercel.json` del commit es el que manda en ese deploy.
-
-Después:
+La CLI imprime una URL `https://octohype-api-….vercel.app` (el nombre varía). Esa URL **no** es `iartlabs.lat`.
 
 ```bash
-curl -i https://iartlabs.lat/api/health
+curl -i https://TU-URL.vercel.app/api/health
+```
+
+Tiene que decir `content-type: application/json` y un cuerpo `{"ok":true,"service":"octohype-api",...}`.
+
+`https://iartlabs.lat/` no cambia con este comando, porque el dominio sigue en el otro proyecto.
+
+## 4. Agregar solo el subdominio
+
+En el navegador: Vercel → el proyecto **nuevo** → Settings → Domains → Add:
+
+```text
+api.iartlabs.lat
+```
+
+No escribas `iartlabs.lat` ni `www.iartlabs.lat` ahí.
+
+Vercel te muestra el DNS que falta. Casi siempre es:
+
+| Tipo | Nombre | Destino |
+| --- | --- | --- |
+| CNAME | `api` | `cname.vercel-dns.com` |
+
+Usa el destino **exacto** que muestre la pantalla de Vercel si es distinto.
+
+Dónde crearlo: el DNS de `iartlabs.lat` (Cloudflare u otro). Solo ese registro. No toques el registro del apex (`@` / `iartlabs.lat`) ni el de `www`.
+
+Si Cloudflare tiene el proxy naranja, para la primera verificación deja `api` en «DNS only» (nube gris) hasta que Vercel marque el dominio como válido. Después puedes volver a activar el proxy.
+
+## 5. Comprobar el subdominio
+
+Cuando el dominio quede en verde:
+
+```bash
+curl -i https://api.iartlabs.lat/api/health
+curl -i https://api.iartlabs.lat/health
+curl -i https://api.iartlabs.lat/octohype
+curl -i https://api.iartlabs.lat/octohype/status
+curl -i https://api.iartlabs.lat/
 curl -i https://iartlabs.lat/
 ```
 
-## 6. El dominio que ya está en Vercel
+- Los cuatro primeros de la API son JSON (`/api/health` y `/health` dicen lo mismo).
+- `https://api.iartlabs.lat/` responde `307` con `Location: /api`. `curl -L` sigue el redirect y muestra el catálogo.
+- `https://iartlabs.lat/` sigue siendo la home Vite de siempre (HTML, título `frontend`).
 
-Si `iartlabs.lat` ya figura en Settings → Domains de **este** proyecto, no cambies DNS para que `/api` funcione. El path `/api` sale del mismo deploy que la landing.
+## Probar en tu máquina (opcional, antes del dominio)
 
-En el dashboard, borra un Rewrite manual que sea «todo → `/index.html`» (`/(.*)` o `/:path*`). Si esa regla sigue en el proyecto, puede volver a servir el HTML en `/api`. La regla buena ya está en `vercel.json` y deja `/api` fuera.
+```bash
+vercel dev --local
+```
 
-Los archivos que sí existen (`/MANUALES/...`, `/demos/...`) se sirven tal cual. Vercel mira el disco antes de aplicar el rewrite.
+Sin la CLI:
 
-## 7. Más adelante: `api.iartlabs.lat` (opcional)
+```bash
+npm run dev:api
+```
 
-No hace falta para v1. La forma preferida es `https://iartlabs.lat/api/...`.
+```bash
+curl -i http://127.0.0.1:3000/api/health
+curl -i http://127.0.0.1:3000/
+curl -i -H "Host: api.iartlabs.lat" http://127.0.0.1:3000/health
+curl -i -H "Host: api.iartlabs.lat" http://127.0.0.1:3000/
+```
 
-Cuando quieras el subdominio:
+`/api/health` es JSON. `/` sin ese `Host` sigue siendo el HTML de este repo. Con `Host: api.iartlabs.lat`, `/health` es JSON y `/` es el 307 hacia `/api`.
 
-1. Vercel → Project → Settings → Domains → Add → `api.iartlabs.lat`.
-2. En el DNS de `iartlabs.lat` (Cloudflare u otro), un registro **CNAME**:
-   - Nombre: `api`
-   - Destino: el que muestre Vercel (casi siempre `cname.vercel-dns.com`)
-3. Si Cloudflare tiene el proxy naranja, para la primera verificación conviene dejar el registro en «DNS only» (nube gris) hasta que el certificado quede activo. Luego puedes volver a activar el proxy.
-4. La ruta no cambia. Queda `https://api.iartlabs.lat/api/health`, no `https://api.iartlabs.lat/health`.
+`npm run verify:api` repite esas comprobaciones.
 
-Las respuestas ya traen `access-control-allow-origin: *`, así un GET desde otra página puede leer el JSON.
+Nota: `vercel dev` a veces no aplica las reglas `has` (el filtro por host) en local. En ese caso los atajos se comprueban con `npm run dev:api` y, de verdad, al tener `api.iartlabs.lat` apuntando al proyecto nuevo. `/api/*` sí responde en `vercel dev`.
 
-## Qué no incluye esta v1
+## Qué no incluye v1
 
 - Sin Firebase y sin variables secretas.
-- `/api/octohype/status` marca cada tentáculo con `"state": "stub"` y `"stub": true`. No afirma que estén en línea.
-- No hay `POST /api/octohype/execute`. Una ruta `/api` desconocida responde JSON 404, no el HTML de la landing.
+- `/octohype/status` y `/api/octohype/status` marcan `"stub": true`. No hay backend de tentáculos.
+- No hay `POST /api/octohype/execute`. Una ruta `/api` desconocida es JSON 404.

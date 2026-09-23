@@ -39,6 +39,14 @@ export const ENDPOINTS = [
   },
 ];
 
+/** Atajos solo en el host api.iartlabs.lat. /api/* sigue igual en cualquier host. */
+export const HOST_ALIASES = [
+  { host: "api.iartlabs.lat", path: "/", via: "redirect", destination: "/api" },
+  { host: "api.iartlabs.lat", path: "/health", via: "rewrite", destination: "/api/health" },
+  { host: "api.iartlabs.lat", path: "/octohype", via: "rewrite", destination: "/api/octohype" },
+  { host: "api.iartlabs.lat", path: "/octohype/status", via: "rewrite", destination: "/api/octohype/status" },
+];
+
 const JSON_HEADERS: Record<string, string> = {
   "content-type": "application/json; charset=utf-8",
   "cache-control": "no-store",
@@ -69,6 +77,7 @@ export function catalog(scope: "service" | "octohype") {
     version: VERSION,
     tentacles: TENTACLES,
     endpoints: ENDPOINTS,
+    aliases: HOST_ALIASES,
     ts: nowIso(),
   };
 }

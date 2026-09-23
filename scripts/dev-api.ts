@@ -1,8 +1,12 @@
 /**
  * Servidor local equivalente a `vercel dev` para esta landing + /api.
- * - /api y /api/* → funciones JSON (nunca index.html)
- * - archivo estático existente → ese archivo
- * - cualquier otra ruta → index.html (misma idea que vercel.json)
+ * - /api y /api/* → funciones JSON (nunca index.html), en cualquier host
+ * - host api.iartlabs.lat:
+ *     /            → 307 a /api (redirect; en Vercel un rewrite no tapa index.html)
+ *     /health      → rewrite interno a /api/health
+ *     /octohype    → rewrite interno a /api/octohype
+ *     /octohype/status → rewrite interno a /api/octohype/status
+ * - otro host: archivo estático si existe, si no index.html
  *
  * Uso: npm run dev:api
  */
@@ -32,12 +36,25 @@ const MIME: Record<string, string> = {
 
 type Handler = (request: Request) => Response | Promise<Response>;
 
+const API_HOST = "api.iartlabs.lat";
+
 const routes: Record<string, string> = {
   "/api": "api/index.ts",
   "/api/health": "api/health.ts",
   "/api/octohype": "api/octohype/index.ts",
   "/api/octohype/status": "api/octohype/status.ts",
 };
+
+const friendlyRewrites: Record<string, string> = {
+  "/health": "/api/health",
+  "/octohype": "/api/octohype",
+  "/octohype/status": "/api/octohype/status",
+};
+
+function isApiHost(req: IncomingMessage): boolean {
+  const host = String(req.headers.host || "").split(":")[0].toLowerCase();
+  return host === API_HOST;
+}
 
 function pathnameOf(req: IncomingMessage): string {
   const raw = req.url || "/";
@@ -124,6 +141,19 @@ async function send(res: ServerResponse, response: Response): Promise<void> {
 const server = createServer(async (req, res) => {
   const pathname = pathnameOf(req);
   try {
+    if (isApiHost(req) && pathname === "/") {
+      res.writeHead(307, {
+        location: "/api",
+        "cache-control": "no-store",
+      });
+      res.end();
+      return;
+    }
+    const friendly = isApiHost(req) ? friendlyRewrites[pathname] : undefined;
+    if (friendly) {
+      await send(res, await dispatchApi(req, friendly));
+      return;
+    }
     if (isApi(pathname)) {
       await send(res, await dispatchApi(req, pathname));
       return;

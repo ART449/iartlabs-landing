@@ -8,9 +8,12 @@ import { fileURLToPath } from "node:url";
 const PORT = 4173;
 const BASE = `http://127.0.0.1:${PORT}`;
 
-function curl(path: string): Promise<{ status: number; type: string; body: string }> {
+function curl(
+  path: string,
+  extra: string[] = [],
+): Promise<{ status: number; type: string; location: string; body: string }> {
   return new Promise((resolve, reject) => {
-    const child = spawn("curl", ["-sS", "-D", "-", `${BASE}${path}`], { stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn("curl", ["-sS", "-D", "-", ...extra, `${BASE}${path}`], { stdio: ["ignore", "pipe", "pipe"] });
     let out = "";
     let err = "";
     child.stdout.on("data", (chunk) => {
@@ -29,9 +32,11 @@ function curl(path: string): Promise<{ status: number; type: string; body: strin
       const body = split.slice(1).join("\n\n");
       const statusMatch = header.match(/HTTP\/\d(?:\.\d)?\s+(\d+)/);
       const typeMatch = header.match(/content-type:\s*([^\r\n]+)/i);
+      const locationMatch = header.match(/location:\s*([^\r\n]+)/i);
       resolve({
         status: statusMatch ? Number(statusMatch[1]) : 0,
         type: typeMatch ? typeMatch[1].trim() : "",
+        location: locationMatch ? locationMatch[1].trim() : "",
         body,
       });
     });
@@ -123,6 +128,32 @@ try {
   const manual = await curl("/MANUALES/README.md");
   assert(manual.status === 200, `manual status ${manual.status}`);
   assert(!manual.type.includes("text/html"), `static file was rewritten to HTML (${manual.type})`);
+
+  const apiHost = ["-H", "Host: api.iartlabs.lat"];
+  const aliasRoot = await curl("/", apiHost);
+  assert(aliasRoot.status === 307, `api host / status ${aliasRoot.status}`);
+  assert(aliasRoot.location.endsWith("/api"), `api host / location ${aliasRoot.location}`);
+
+  const aliasHealth = await curl("/health", apiHost);
+  assert(aliasHealth.status === 200, `alias health status ${aliasHealth.status}`);
+  assert(aliasHealth.type.includes("application/json"), `alias health type ${aliasHealth.type}`);
+  const aliasHealthJson = JSON.parse(aliasHealth.body);
+  assert(aliasHealthJson.ok === true && aliasHealthJson.service === "octohype-api", "alias health body");
+
+  const aliasOcto = await curl("/octohype", apiHost);
+  assert(aliasOcto.type.includes("application/json"), `alias octohype type ${aliasOcto.type}`);
+  assert(JSON.parse(aliasOcto.body).tentacles.length === 8, "alias octohype tentacles");
+
+  const aliasStatus = await curl("/octohype/status", apiHost);
+  assert(aliasStatus.type.includes("application/json"), `alias status type ${aliasStatus.type}`);
+  assert(JSON.parse(aliasStatus.body).stub === true, "alias status stub");
+
+  const apiOnAliasHost = await curl("/api/health", apiHost);
+  assert(apiOnAliasHost.type.includes("application/json"), " /api/health on api host");
+  assert(JSON.parse(apiOnAliasHost.body).ok === true, "/api/health still ok on api host");
+
+  const healthOnOtherHost = await curl("/health");
+  assert(healthOnOtherHost.type.includes("text/html"), `plain /health should stay SPA (${healthOnOtherHost.type})`);
 
   console.log("verify ok");
   console.log(JSON.stringify({ health: healthJson, status: statusJson.note }, null, 2));
